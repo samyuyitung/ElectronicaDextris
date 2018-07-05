@@ -20,3 +20,8 @@ and a bunch of others to control the keys
 I will update this by July 28th, 2018 with better info, but for right now this is what it does
 
 
+### The web controller
+
+This is made in react.
+
+it uses WEB Midi Apis through the WebMidi.js library
