@@ -1,35 +1,50 @@
-import React, { Component } from 'react';
-import WebMidi from 'webmidi';
+import React from 'react';
+import './App.css';
+// @material-ui/core
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Grid from "@material-ui/core/Grid";
+// core components
+import GridItem from "./components/Grid/GridItem.js";
+import {StringCard} from './components';
 
+import 'typeface-roboto'
 
-class App extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      output: {name: 'none'},
-      muted: false
-    };
-    const self = this;
-    WebMidi.enable(() => {console.log(WebMidi.outputs[0]); self.setState({output: WebMidi.outputs[0]})});
-  }
-  
-  render() {
-    return (
-      <div>
-        <h1> Electronica Dextris! </h1>
-        <p> Conencted to: { this.state.output.name} </p>
-      
-        <button onClick={this.handleMute.bind(this)}> {this.state.muted ? 'Unmute' : 'Mute'} </button> 
-      </div>
-    );
-  }
-
-  handleMute() {
-
-    this.state.output.sendControlChange(7, this.state.muted ? 0 : 127, 'all')
-    this.setState({muted: !this.state.muted})
-  }
+function App() {
+  return (
+      <html>
+        <body>
+          <AppBar position="fixed" color="primary">
+            <Toolbar>
+              <Typography variant="title" color="inherit" className="flex">
+                Electronica Dextris
+              </Typography>
+              <Tabs>
+                <Tab label="Basic" />
+                <Tab label="Advanced" />
+                <Tab label="Performance" href="#basic-tabs" />
+              </Tabs>
+            </Toolbar>
+          </AppBar>
+          <div className="container">
+           <Grid container>
+              <GridItem xs={12} sm={6} md={3}>
+                <StringCard/>
+              </GridItem>
+              <GridItem xs={12} sm={6} md={3}>
+                <StringCard/>
+              </GridItem>
+              <GridItem xs={12} sm={6} md={3}>
+                <StringCard/>
+              </GridItem>
+            </Grid>
+          </div>
+        </body>
+      </html>
+  );
 }
 
 export default App;

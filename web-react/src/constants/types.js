@@ -1,0 +1,1 @@
+export const FETCH_STRINGS = 'FETCH_STRINGS';
