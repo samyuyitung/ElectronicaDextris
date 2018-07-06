@@ -1,7 +1,6 @@
 /*
  * Electronica Dextris Teensy 3.5 Code
  * 
- * Authors: SYDE 361 Group 9 
  * Date Created: July 4, 2018
  * 
  * 
@@ -15,25 +14,25 @@
  * 
  */
 
-
-
-
 #define TAC_PIN A0
 #define VOLUME_CC 7
 
 int channel = 1; // Defines the MIDI channel to send messages on (values from 1-16)
+int note = 60; 
 
 int tac_val = 0;
 int tac_prev_val = 0;
-int tac_threshold = 20;
+int tack
+int tac_threshold = 3;
+bool isNoteOn = false;
+
 
 void setup() {
-//  Serial.begin(9600);
 }
 
 void loop() {
   handleTachometer();
-
+  
 }
 
 // MARK: Tachometer code. 
@@ -41,12 +40,17 @@ void loop() {
 void handleTachometer() {
   
   tac_val = analogRead(TAC_PIN);
+  maybeToggleNote(tac_val);
 
-//  acceleration = (tac_val - prev_tac_val)/ time_delta;
-
+  acceleration = (tac_val - prev_tac_val) / nanosPerLoop;
+  
   if (abs(tac_val - tac_prev_val) > tac_threshold) {
-    sendVolumeCC(tac_val / 8);
+    sendVolumeCC(tac_val);
+    sendAccelCC(acceleration);
   }
+
+  
+  
   tac_prev_val = tac_val;
 }
 
@@ -55,3 +59,21 @@ void sendVolumeCC(int volume) {
     
     usbMIDI.sendControlChange(VOLUME_CC,volume,channel);
 }
+
+
+void sendAccelCC(int accel) {
+//    if (volume < 0 || volume > 127) return;
+    
+    usbMIDI.sendControlChange(VOLUME_CC,volume,channel);
+}
+
+void maybeToggleNote(int val) {
+  if (val == 0 && isNoteOn) {
+    usbMIDI.sendNoteOn(note, 100, channel);
+    isNoteOn = true;
+  } else if (val > 0 && !isNoteOn) {
+    usbMIDI.sendNoteOff(note, 100, channel);
+    isNoteOn = false;
+  }
+}
+
