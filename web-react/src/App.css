@@ -1,0 +1,17 @@
+body {
+  background-color: #f4f4f4;
+}
+
+.container {
+  margin: 88px 0 0 0;
+  flex: 1 1 auto;
+}
+
+.flex {
+  flex: 1;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
