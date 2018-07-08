@@ -1,6 +1,7 @@
 /*
  * Electronica Dextris Teensy 3.5 Code
  * 
+ * Authors: SYDE 361 Group 9 
  * Date Created: July 4, 2018
  * 
  * 
@@ -10,70 +11,60 @@
  *    This value is then "differentiated" to capture the instantaneous acceleration
  *    of the shaft. 
  *    The velocity controls the volume of the sound (MidiCC on channel 7)
- *    The acceleration does ¿SOMETHING?
+ *    The acceleration sends a "
  * 
  */
 
 #define TAC_PIN A0
 #define VOLUME_CC 7
+#define EXPRESSION_CC 11
 
 int channel = 1; // Defines the MIDI channel to send messages on (values from 1-16)
-int note = 60; 
 
-int tac_val = 0;
-int tac_prev_val = 0;
-int tack
-int tac_threshold = 3;
-bool isNoteOn = false;
+const int numReadings = 5;
+int currentIndex = 0;
+int tacHistory[numReadings];
 
-
+int avgVelocity = 0;
 void setup() {
+  for (int i = 0; i < numReadings; i++) tacHistory[i] = 0;
 }
 
 void loop() {
-  handleTachometer();
-  
+     handleTachometer();
+     delay(10);
 }
 
 // MARK: Tachometer code. 
 
-void handleTachometer() {
-  
-  tac_val = analogRead(TAC_PIN);
-  maybeToggleNote(tac_val);
+void handleTachometer() {  
+  tacHistory[currentIndex++] = analogRead(TAC_PIN);    
 
-  acceleration = (tac_val - prev_tac_val) / nanosPerLoop;
-  
-  if (abs(tac_val - tac_prev_val) > tac_threshold) {
-    sendVolumeCC(tac_val);
-    sendAccelCC(acceleration);
+  if (currentIndex >= numReadings)
+    currentIndex = 0;
+
+  avgVelocity = min(calculateAverage() / 3, 127);
+  sendVolumeCC(avgVelocity);
+  sendTrompetteCC(avgVelocity);
+}
+
+int calculateAverage() {
+  int sum = 0;
+  for (int i = 0; i < numReadings; i++) {
+    sum += tacHistory[i];
   }
-
-  
-  
-  tac_prev_val = tac_val;
+  return sum / numReadings;
 }
 
 void sendVolumeCC(int volume) {
-    if (volume < 0 || volume > 127) return;
-    
     usbMIDI.sendControlChange(VOLUME_CC,volume,channel);
 }
 
 
-void sendAccelCC(int accel) {
-//    if (volume < 0 || volume > 127) return;
-    
-    usbMIDI.sendControlChange(VOLUME_CC,volume,channel);
+void sendTrompetteCC(int velocity) {
+    if (velocity > 70) {
+      usbMIDI.sendControlChange(EXPRESSION_CC,velocity,channel);
+    } else {
+      usbMIDI.sendControlChange(EXPRESSION_CC,0,channel);
+    }
 }
-
-void maybeToggleNote(int val) {
-  if (val == 0 && isNoteOn) {
-    usbMIDI.sendNoteOn(note, 100, channel);
-    isNoteOn = true;
-  } else if (val > 0 && !isNoteOn) {
-    usbMIDI.sendNoteOff(note, 100, channel);
-    isNoteOn = false;
-  }
-}
-
