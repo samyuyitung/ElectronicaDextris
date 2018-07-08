@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/lab/Slider';
 
+
+import MidiController from '../../Controllers/MidiController';
+import { VOLUME_CC } from '../../Constants/MidiConstants';
+import MidiUtil from '../../util/MidiUtil.js'
 const styles = {
   root: {
     width: 180,
@@ -11,13 +14,26 @@ const styles = {
 };
 
 class SimpleSlider extends React.Component {
-  state = {
+
+
+  constructor(props) {
+    super(props)
+    this.state = {
     value: 50,
+    note: props.note
+  }
   };
+
 
   handleChange = (event, value) => {
     this.setState({ value });
+    this.handleMidi(value);
   };
+
+  handleMidi = (value) => {
+    const midiVal = MidiUtil.rescaleToMidi(0,100, value);
+    MidiController.sendCC(VOLUME_CC, midiVal, this.state.note.channel);
+  }
 
   render() {
     const { classes } = this.props;
@@ -25,8 +41,7 @@ class SimpleSlider extends React.Component {
 
     return (
       <div className={classes.root}>
-        <Typography id="label">Volume</Typography>
-        <Slider value={value} aria-labelledby="label" onChange={this.handleChange} />
+        <Slider value={value} aria-labelledby="label" onChange={this.handleChange.bind(this)} />
       </div>
     );
   }

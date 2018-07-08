@@ -1,25 +1,31 @@
 import React from 'react'
 import Card from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader';
-import IconButton from '@material-ui/core/IconButton';
-// icons
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Button from '@material-ui/core/Button';
 
 import SwitchListSecondary from "../List/List.js";
+import header from '../Header/index.js';
 
-const StringCard = ({string}) =>
+const headerStyle = {
+    backgroundColor: '#2F80ED',
+    color: 'white!important',
+    height: '20px'
+
+  };
+  
+const StringCard = (props) =>
     <div>
         <Card>
             <CardHeader
                 action={
-                <IconButton>
-                    <MoreVertIcon />
-                </IconButton>
+                <Button size='small' type='text' style={{color:'white', padding: '5px', height: '10px'}}>
+                    edit
+                </Button>
                 }
-                title="Melody Strings"
+                subheader={`${props.stringType} Strings`}
+                style={headerStyle}
             />
-            <SwitchListSecondary>
-            </SwitchListSecondary>
+            <SwitchListSecondary keys={props.keys}/>
         </Card>
     </div>
 
