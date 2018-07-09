@@ -1,6 +1,6 @@
 
 export default {
     rescaleToMidi:(min, max, val) => {
-        return (val / (max - min) * 127)
+        return ((val - min) / (max - min) * 127)
     }
 }
